@@ -1,0 +1,5 @@
+bucket=s3://Bucket/
+awsid=asldkfjlsadkfj
+awssecret=asldkfjçsaldfj
+region=us-east-1
+fileoutput=json

@@ -1,0 +1,76 @@
+FROM amazonlinux:2
+MAINTAINER intelivix
+
+ENV WORKDIR=/var/task \
+    PIPENV_VENV_IN_PROJECT=1 \
+    LC_ALL=C.UTF-8 \
+    LANG=C.UTF-8 \
+    MONGODB_URL=example \
+    POSTGRESQL_URL=example \
+    COLLECTION_NAME=example \
+    DEBUG=True \
+    DEBUG_STRING=homolog
+
+ENV PYENV_ROOT $WORKDIR/.pyenv
+ENV PIPENV_CACHE_DIR $WORKDIR/.pipenv
+ENV PIPENV_PYTHON ${PYENV_ROOT}/shims/python
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+ENV BUILD_PACKAGES bzip2-devel gcc git wget which libxml2-dev libxslt-dev make \
+                   openssl-devel python36-dev readline-devel postgresql-devel \
+                   sqlite-devel tar awscli poppler-utils rpm binutils build-essential \
+		   bzip2 ca-certificates libglib2.0-0 libsm6 libxext6 libxrender1 wget curl
+		      
+WORKDIR ${WORKDIR}
+
+ENV LUIGI_CONFIG_DIR /etc/luigi/
+ENV LUIGI_CONFIG_PATH /etc/luigi/luigi.conf
+ENV LUIGI_STATE_DIR /luigi/state
+ENV MINICONDA_VERSION latest
+ENV PATH /opt/conda/bin:$PATH
+
+
+RUN yum install -y ${BUILD_PACKAGES} && \
+    git clone git://github.com/yyuu/pyenv.git .pyenv && \
+    pyenv install 3.6.7 && \
+    pyenv global 3.6.7 && \
+    pyenv rehash && \
+    yum clean all && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
+    curl -k -o /miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    curl http://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/u/unrtf-0.21.9-8.el7.x86_64.rpm --output unrtf.rpm && \
+    rpm -Uvh unrtf.rpm && \
+    /bin/bash /miniconda.sh -b -p /opt/conda && \
+    rm /miniconda.sh && \
+    /opt/conda/bin/conda config \
+        --set always_yes yes \
+        --set changeps1 no \
+        --set show_channel_urls True \
+        && \
+    /opt/conda/bin/conda config \
+        --add channels conda-forge \
+        && \
+    /opt/conda/bin/conda install \
+        luigi==2.8.3 \
+        sqlalchemy \
+        psycopg2 \
+        mysql-connector-python \
+        && \
+    /opt/conda/bin/conda clean -a -y && \
+    mkdir -p ${LUIGI_CONFIG_DIR} && \
+    mkdir -p ${LUIGI_STATE_DIR}
+
+RUN yum install unrtf
+
+COPY logging.conf ${LUIGI_CONFIG_DIR}
+COPY luigi.conf ${LUIGI_CONFIG_DIR}
+VOLUME ["${LUIGI_CONFIG_DIR}", "${LUIGI_STATE_DIR}"]
+
+EXPOSE 8082/TCP
+USER root
+COPY luigid.sh /bin/run
+COPY parametros /bin/parametros
+COPY primeiro.py /bin/primeiro.py
+COPY converter.sh /bin/converter.sh
+ENTRYPOINT ["/bin/run"]
+#ENTRYPOINT ["/bin/bash"]
