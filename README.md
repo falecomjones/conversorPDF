@@ -1,4 +1,4 @@
-Este projeto é um container que converte de documentos de PDF|RTF para TXT, com o processo sendo monitorado pelo Luigi (https://luigi.readthedocs.io/en/stable/). Neste repositório contém os arquivos que formam a imagem: Docker file, arquivos .py, parametros, etc. 
+Este projeto é um container que converte documentos PDF|RTF para TXT, com o processo sendo monitorado pelo Luigi (https://luigi.readthedocs.io/en/stable/). Neste repositório contém os arquivos que formam a imagem: Docker file, arquivos .py, parametros, etc. 
 
 Para utilizá-lo siga os passos:
 
