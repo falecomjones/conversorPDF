@@ -11,5 +11,17 @@ Para utilizá-lo siga os passos:
   Comando: docker container run -p 8082:8082 -e BUCKET='s3://bucket/' -e AWSID='TUAAWSID' -e AWSSECRET='TUAAWSSECRET' -e REGION='us-east-1' -e FILEOUTPUT='json' -t jonessarmento/luigimage:1.0;
   
   ~> Se tudo funcionar, um arquivo chamado "output_BUCKET_.tar.gz" será retornado no bucket que você passou. 
-  
+ 
  Valeu!
+
+--------
+
+-> Dockerfiles:
+ 
+* O arquivo DockerfileAWS é para criar uma imagem que roda no AWS-BATCH;
+ 
+* Já o arquivo DockerfileUBUNTU, é para rodar em pc Linux;
+
+thanks!
+ 
+
